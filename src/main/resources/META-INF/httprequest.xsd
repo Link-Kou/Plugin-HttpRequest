@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--targetNamespace : 定义的命名空间-->
+<xsd:schema xmlns="http://www.spring.http.com/spring/httprequest"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:beans="http://www.springframework.org/schema/beans"
+            xmlns:tool="http://www.springframework.org/schema/tool"
+            targetNamespace="http://www.spring.http.com/spring/httprequest"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+    <xsd:import namespace="http://www.springframework.org/schema/beans"/>
+    <xsd:import namespace="http://www.springframework.org/schema/tool"/>
+    <!--参数-->
+    <xsd:element name="httpProcessor" id="httpprocessor">
+        <!--解除IDEA的Bean无法失败警告-->
+        <xsd:annotation>
+            <xsd:appinfo>
+                <tool:annotation>
+                    <tool:exports type="fully.qualified.ClassName"/>
+                </tool:annotation>
+            </xsd:appinfo>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="beans:identifiedType">
+                    <xsd:sequence>
+                        <xsd:element ref="prefix" minOccurs="1" maxOccurs="unbounded"/>
+                        <xsd:element ref="httpConversion" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element ref="properties" minOccurs="1" maxOccurs="1"/>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="prefix">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="beans:identifiedType">
+                    <xsd:sequence>
+                        <xsd:element ref="beans:value" minOccurs="1" maxOccurs="unbounded"/>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="httpConversion">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="beans:identifiedType">
+                    <xsd:attribute name="class" type="xsd:token" use="required">
+                        <xsd:annotation>
+                            <xsd:documentation><![CDATA[ 自定义转换. ]]></xsd:documentation>
+                            <xsd:appinfo>
+                                <tool:annotation>
+                                    <tool:expected-type type="java.lang.Class"/>
+                                </tool:annotation>
+                            </xsd:appinfo>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+
+    <xsd:element name="properties">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="beans:identifiedType">
+                    <xsd:sequence>
+                        <xsd:element ref="path" minOccurs="1" maxOccurs="1"/>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="path">
+        <xsd:complexType mixed="true">
+            <xsd:choice minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:complexType>
+    </xsd:element>
+
+
+
+
+</xsd:schema>

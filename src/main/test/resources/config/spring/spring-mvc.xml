@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:http="http://www.spring.http.com/spring/httprequest"
+       xsi:schemaLocation="http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+        http://www.spring.http.com/spring/httprequest http://www.spring.http.com/spring/httprequest.xsd">
+
+    <!-- 启动SpringMVC的注解功能 -->
+    <!-- 自动扫描该包 -->
+    <context:component-scan base-package="com"/>
+
+    <!-- 激活自动代理功能 -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+
+    <!-- HTTP请求配置-->
+    <bean class="com.plugin.httprequest.spring.HTTPBeanProcessor">
+        <property name="prefix">
+            <array value-type="java.lang.String">
+                <value>com</value>
+            </array>
+        </property>
+        <property name="httpConversion">
+            <bean class="com.conversion.HttpReturnConversion" />
+        </property>
+        <property name="locations">
+            <list>
+                <value>classpath*:*/*/httpurl.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <http:httpProcessor>
+        <http:prefix>
+            <value>com</value>
+        </http:prefix>
+        <http:httpConversion class="com.MsgPushServerTest"/>
+        <http:properties>
+            <http:path>classpath*:*/*/httpurl.properties</http:path>
+        </http:properties>
+    </http:httpProcessor>
+
+
+
+
+</beans>
