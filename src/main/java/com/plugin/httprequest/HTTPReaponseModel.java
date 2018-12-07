@@ -86,7 +86,6 @@ public class HTTPReaponseModel implements HTTPResponse<Object> {
 	 * @param httpResult
 	 * @return
 	 */
-	@Deprecated
 	@Override
 	public <E> E isChainModeCall(HttpResult<E, Object> httpResult,E jsonResult) {
 		if(isSuccessful()){

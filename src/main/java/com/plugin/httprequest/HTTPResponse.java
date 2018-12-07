@@ -46,6 +46,7 @@ public interface HTTPResponse<T> {
 	 * @param <E>
 	 * @return
 	 */
+	@Deprecated
 	<E> E isChainModeCall(HttpResult<E, T> httpResult,E jsonResult);
 
 	/**
@@ -53,7 +54,6 @@ public interface HTTPResponse<T> {
 	 * 在一定的情况下，model转换失败会直接抛出错误
 	 * @return
 	 */
-	@Deprecated
 	T getModel();
 
 

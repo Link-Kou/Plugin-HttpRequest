@@ -1,6 +1,8 @@
 package com.plugin.httprequest;
 
 import com.plugin.httprequest.extendInterceptor.*;
+import com.plugin.httprequest.ssl.NotSSL;
+import com.plugin.httprequest.ssl.UserSSL;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +59,7 @@ public class Retrofits {
      * @param args           参数值
      * @return
      */
-    public HTTPReaponseModel getRetrofit(HttpConversion httpConversion, List<InterceptorPlus> okhttpInterceptor,Class classs, Method methodcall, Object... args) {
+    public HTTPReaponseModel getRetrofit(HttpConversion httpConversion, List<InterceptorPlus> okhttpInterceptor, Class classs, Method methodcall, Object... args) {
         HTTPRequest HTTPRequest = (com.plugin.httprequest.HTTPRequest) classs.getAnnotation(HTTPRequest.class);
         OkHttpClient.Builder httpBuilder = new OkHttpClient.Builder();
         /*HTTP请求*/
@@ -69,10 +71,14 @@ public class Retrofits {
                 .addInterceptor(new InterceptorCookie(methodcall))
                 .addInterceptor(new InterceptorGetBody(methodcall))
                 .addInterceptor(new InterceptorConnection());
-        if(okhttpInterceptor!= null){
-            okhttpInterceptor.stream().filter(Objects::nonNull).forEach(x-> builder.addInterceptor(x.setMethod(methodcall)));
+        if (okhttpInterceptor != null) {
+            okhttpInterceptor.stream().filter(Objects::nonNull).forEach(x -> builder.addInterceptor(x.setMethod(methodcall)));
         }
         OkHttpClient okHttpClient = builder.build();
+        /**
+         * SSL安全连接
+         */
+        SSL(HTTPRequest, builder, okHttpClient);
         //1.创建Retrofit对象
         Retrofit retrofit = new Retrofit.Builder()
                 .client(okHttpClient)
@@ -99,6 +105,26 @@ public class Retrofits {
     }
 
     /**
+     * SSL连接
+     * @param HTTPRequest
+     * @param builder
+     * @param okHttpClient
+     */
+    private void SSL(HTTPRequest HTTPRequest, OkHttpClient.Builder builder, OkHttpClient okHttpClient) {
+        if (HTTPRequest.NotSSL() && HTTPRequest.SSL()) {
+            throw new IllegalAccessError();
+        } else {
+            //安全请求
+            if (HTTPRequest.NotSSL()) {
+                NotSSL.SSLNotCheck(okHttpClient);
+            }
+            if (HTTPRequest.SSL()) {
+                UserSSL.UserSSL(builder, HTTPRequest.SSLPassword(), HTTPRequest.SSLfile());
+            }
+        }
+    }
+
+    /**
      * 获取到对应的方法
      *
      * @param methods
@@ -112,7 +138,7 @@ public class Retrofits {
                     for (int i = 0; i < m.getParameters().length; i++) {
                         Type parameterizedType = methodcall.getParameters()[i].getParameterizedType();
                         //泛型判断
-                        if(parameterizedType instanceof ParameterizedTypeImpl){
+                        if (parameterizedType instanceof ParameterizedTypeImpl) {
                             Class<?> rawType = ((ParameterizedTypeImpl) methodcall.getParameters()[i].getParameterizedType()).getRawType();
                             parameterizedType = rawType;
                         }

@@ -2,7 +2,6 @@ package com.plugin.httprequest;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import java.lang.annotation.*;
 
 /**
@@ -45,6 +44,30 @@ public @interface HTTPRequest {
 	 * @return
 	 */
 	long connectTimeout() default 15;
+
+	/**
+	 * 是否取消安全请求
+	 * @return
+	 */
+	boolean NotSSL() default false;
+
+	/**
+	 * 是否启用安全请求与NotSSL互斥不能同时为true
+	 * @return
+	 */
+	boolean SSL() default false;
+
+	/**
+	 * 双向安全证书
+	 * @return
+	 */
+	String SSLfile() default "";
+
+	/**
+	 * 双向安全证书密码
+	 * @return
+	 */
+	String SSLPassword() default "";
 
 
 }
