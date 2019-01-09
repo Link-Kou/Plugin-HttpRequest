@@ -7,7 +7,7 @@
 	<groupId>com.plugin</groupId>
 	<artifactId>HttpRequest</artifactId>
 	<packaging>jar</packaging>
-	<version>3.0.9</version>
+	<version>3.1.0</version>
 	<name>Plugin-HttpRequest-${project.version}</name>
 	<url>http://maven.apache.org</url>
 
@@ -207,7 +207,7 @@
 				</configuration>
 			</plugin>
 			<!-- 生成sources源码包的插件 -->
-			<!--<plugin>
+			<plugin>
 				<artifactId>maven-source-plugin</artifactId>
 				<version>3.0.1</version>
 				<configuration>
@@ -221,7 +221,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>-->
+			</plugin>
 			<!-- 打包JAR -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
