@@ -57,7 +57,8 @@ public class NotSSL {
 
             Field writeTimeout = workerClass.getDeclaredField("writeTimeout");
             writeTimeout.setAccessible(true);
-            writeTimeout.set(sClient, (int) TimeUnit.MILLISECONDS.toMillis(15560)); //毫秒
+            //毫秒
+            writeTimeout.set(sClient, (int) TimeUnit.MILLISECONDS.toMillis(15560));
 
             Field readTimeout = workerClass.getDeclaredField("readTimeout");
             readTimeout.setAccessible(true);

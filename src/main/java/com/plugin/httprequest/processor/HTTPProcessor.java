@@ -143,10 +143,9 @@ public class HTTPProcessor extends AbstractProcessor {
                 }
             }
             /**
-             * 变量的调用new方法 TestInterface testInterface = (TestInterface) new HTTPProxyInstanceTest(TestInterface.class).getProxy();
+             * 变量的调用new方法
+             * TestInterface testInterface = (TestInterface) new HTTPProxyInstanceTest(TestInterface.class).getProxy();
              */
-
-
             JCTree.JCExpression loggerNewClass = make.NewClass(null,
                     null,
                     //类名称 会自己导入包
@@ -176,7 +175,8 @@ public class HTTPProcessor extends AbstractProcessor {
                     com.sun.tools.javac.util.List.nil(),
                     //构建 -> getProxy()
                     loggerType2,
-                    com.sun.tools.javac.util.List.nil());//参数
+                    //参数
+                    com.sun.tools.javac.util.List.nil());
 
 
             JCTree.JCVariableDecl jcv = make.VarDef(

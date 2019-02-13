@@ -8,14 +8,19 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
- * HTTP Get发送的Body是无法被Spring正常接收
+ * HTTP Get发送的Body由于框架的本身的限制发送后无法被Spring正常接收
  * @author lk
  * @date 2018/9/20 11:19
  */
+@Deprecated
 public class InterceptorGetBody implements Interceptor {
 
     private boolean getbody = false;
 
+    /**
+     * HTTP Get发送的Body由于框架的本身的限制发送后无法被Spring正常接收
+     * @param methodcall
+     */
     public InterceptorGetBody(Method methodcall) {
         if (methodcall != null) {
             GetBody getBody = methodcall.getAnnotation(GetBody.class);

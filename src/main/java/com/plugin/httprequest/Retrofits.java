@@ -41,9 +41,12 @@ public class Retrofits {
      * @param method
      */
     public void getActualTypeArguments(Method method) {
-        Type type = method.getGenericReturnType();// 获取返回值类型
-        if (type instanceof ParameterizedType) { // 判断获取的类型是否是参数类型
-            Type[] typesto = ((ParameterizedType) type).getActualTypeArguments();// 强制转型为带参数的泛型类型，
+        // 获取返回值类型
+        Type type = method.getGenericReturnType();
+        // 判断获取的类型是否是参数类型
+        if (type instanceof ParameterizedType) {
+            // 强制转型为带参数的泛型类型，
+            Type[] typesto = ((ParameterizedType) type).getActualTypeArguments();
             if (typesto.length == 1) {
                 this.type = typesto[0];
             }
@@ -62,15 +65,21 @@ public class Retrofits {
     public HTTPReaponseModel getRetrofit(HttpConversion httpConversion, List<InterceptorPlus> okhttpInterceptor, Class classs, Method methodcall, Object... args) {
         HTTPRequest HTTPRequest = (com.plugin.httprequest.HTTPRequest) classs.getAnnotation(HTTPRequest.class);
         OkHttpClient.Builder httpBuilder = new OkHttpClient.Builder();
-        /*HTTP请求*/
+        /**
+         * HTTP请求
+         * SECONDS:秒
+         */
         final OkHttpClient.Builder builder = httpBuilder
-                .writeTimeout(HTTPRequest.writeTimeout(), TimeUnit.SECONDS)//秒
+                //允许失败重试
+                .retryOnConnectionFailure(HTTPRequest.retry().retryFailure())
+                .writeTimeout(HTTPRequest.writeTimeout(), TimeUnit.SECONDS)
                 .readTimeout(HTTPRequest.readTimeout(), TimeUnit.SECONDS)
                 .connectTimeout(HTTPRequest.connectTimeout(), TimeUnit.SECONDS)
                 .addInterceptor(new InterceptorHttpLogging())
                 .addInterceptor(new InterceptorCookie(methodcall))
                 .addInterceptor(new InterceptorGetBody(methodcall))
-                .addInterceptor(new InterceptorConnection());
+                .addInterceptor(new InterceptorConnection())
+                .addInterceptor(new InterceptorRetryDirectional(HTTPRequest.retry()));
         if (okhttpInterceptor != null) {
             okhttpInterceptor.stream().filter(Objects::nonNull).forEach(x -> builder.addInterceptor(x.setMethod(methodcall)));
         }
@@ -82,9 +91,16 @@ public class Retrofits {
         //1.创建Retrofit对象
         Retrofit retrofit = new Retrofit.Builder()
                 .client(okHttpClient)
+                /**
+                 * 对注解解析进行自定义转换
+                 */
                 .addConverterFactory(HTTPResponseConverterFactory.create(httpConversion))
+                /**
+                 * 请求结果转换的自定义返回参数
+                 */
                 .addCallAdapterFactory(HTTPReaponseCallAdapterFactory.create(httpConversion, type))
-                .baseUrl(new HttpBaseUrlImpl(HTTPRequest).geUrl())//主机地址
+                //主机地址
+                .baseUrl(new HttpBaseUrlImpl(HTTPRequest).geUrl())
                 .build();
         try {
             Object Ob = retrofit.create(classs);
@@ -106,20 +122,21 @@ public class Retrofits {
 
     /**
      * SSL连接
+     *
      * @param HTTPRequest
      * @param builder
      * @param okHttpClient
      */
     private void SSL(HTTPRequest HTTPRequest, OkHttpClient.Builder builder, OkHttpClient okHttpClient) {
-        if (HTTPRequest.NotSSL() && HTTPRequest.SSL()) {
+        if (HTTPRequest.ssl().NotSSL() && HTTPRequest.ssl().SSL()) {
             throw new IllegalAccessError();
         } else {
             //安全请求
-            if (HTTPRequest.NotSSL()) {
+            if (HTTPRequest.ssl().NotSSL()) {
                 NotSSL.SSLNotCheck(okHttpClient);
             }
-            if (HTTPRequest.SSL()) {
-                UserSSL.UserSSL(builder, HTTPRequest.SSLPassword(), HTTPRequest.SSLfile());
+            if (HTTPRequest.ssl().SSL()) {
+                UserSSL.UserSSL2(okHttpClient, HTTPRequest.ssl().SSLPassword(), HTTPRequest.ssl().SSLfile());
             }
         }
     }

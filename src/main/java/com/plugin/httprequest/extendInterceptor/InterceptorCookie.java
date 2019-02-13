@@ -23,6 +23,10 @@ public class InterceptorCookie implements Interceptor {
 
     private Boolean isCookie = false;
 
+    /**
+     * Cookie拦截器
+     * @param methodcall
+     */
     public InterceptorCookie(Method methodcall) {
         if (methodcall != null) {
             Cookies Cookies = methodcall.getAnnotation(Cookies.class);
