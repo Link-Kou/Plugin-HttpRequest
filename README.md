@@ -1,3 +1,12 @@
+# Plugin-HttpRequest
+
+### Plugin-HttpRequest 能做什么？
+
+> 基于OkHttp的retrofit二次封装实现以下功能
+- 基于Spring实现@Autowired注入
+- 扩展输入输出解析，实现自定义拦截器
+- 各类辅助
+
 支持功能
 ---
 - `SSL` 支持绝对路径输入证书。 `支持`
