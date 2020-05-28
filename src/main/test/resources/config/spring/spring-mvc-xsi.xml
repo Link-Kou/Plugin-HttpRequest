@@ -2,12 +2,20 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:http="http://www.spring.http.com/spring/httprequest"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+        http://www.spring.http.com/spring/httprequest http://www.spring.http.com/spring/httprequest.xsd">
 
     <!-- 启动SpringMVC的注解功能 -->
     <!-- 自动扫描该包 -->
     <context:component-scan base-package="com"/>
+
+    <!-- 激活自动代理功能 -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
 
     <!-- HTTP请求配置-->
     <bean class="com.linkkou.httprequest.spring.HTTPBeanProcessor">
@@ -16,17 +24,8 @@
                 <value>com</value>
             </array>
         </property>
-        <!--定义输入输出转换器-->
         <property name="httpConversion">
-            <list>
-                <bean class="com.linkkou.httprequest.extendPlugin.impl.HttpReturnJsonConversion"/>
-                <bean class="com.linkkou.httprequest.extendPlugin.impl.HttpReturnXmlConversion"/>
-            </list>
-        </property>
-        <property name="okhttpInterceptor">
-            <list>
-                <bean class="com.Spring.interceptor.InterceptorCookiePlus"/>
-            </list>
+            <bean class="com.linkkou.httprequest.extendPlugin.impl.HttpReturnJsonConversion"/>
         </property>
         <property name="locations">
             <list>
