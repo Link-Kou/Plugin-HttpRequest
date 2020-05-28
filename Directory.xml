@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<trees properties="" code="" codeval="" msg="">
+    <model path="/src/main/java/com/linkkou/httprequest" title="基础" msg="">
+        <tree path="/extendAnnotations" title="配置-xy" tooltip="<b>Code:7*****</b>">
+            <tree path="/annotation" title="注解管理" tooltip="<b>Code:1**8*</b>"/>
+            <tree path="/beetl" title="模板生成" tooltip="<b>Code:1**8*</b>"/>
+        </tree>
+    </model>
+</trees>
