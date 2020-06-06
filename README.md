@@ -14,6 +14,16 @@
 导致的问题也比较多。在使用上面，也是不太方便。所以在工作中基于这一类的问题，进行了封装。
 简化使用中的一些繁琐性的问题。
 
+Maven
+---
+```xml
+<dependency>
+    <groupId>com.github.link-kou</groupId>
+    <artifactId>http-request</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
 支持功能
 ---
 - `SSL` 支持绝对路径输入证书。 `支持`
