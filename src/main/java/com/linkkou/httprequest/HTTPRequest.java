@@ -20,41 +20,14 @@ import java.lang.annotation.*;
 @Target({ElementType.FIELD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Component // 标明可被 Spring 扫描
+// 标明可被 Spring 扫描
+@Component
 public @interface HTTPRequest {
-
-    /**
-     * 是否启用重试
-     */
-    public @interface Retry {
-        /**
-         * 是否启用重试
-         *
-         * @return
-         */
-        boolean retryFailure() default false;
-
-        /**
-         * 重试次数
-         * 重试次数为1，重试后默认请求加上重试次数一共会发送2次请求
-         *
-         * @return
-         */
-        int retryNumber() default 0;
-
-        /**
-         * 重定向url
-         *
-         * @return
-         */
-        Value retryUrl() default @Value("");
-    }
-
 
     /**
      * 配置SSL
      */
-    public @interface SSL {
+    @interface SSL {
 
         /**
          * SSL配置属性
@@ -107,32 +80,32 @@ public @interface HTTPRequest {
     Value value();
 
     /**
-     * 写入超时
+     * 写入超时 秒
      *
      * @return
      */
-    long writeTimeout() default 15;
+    long writeTimeout() default 8;
 
     /**
-     * 读取超时
+     * 读取超时 秒
      *
      * @return
      */
-    long readTimeout() default 15;
+    long readTimeout() default 8;
 
     /**
-     * 链接超时
+     * 链接超时 秒
      *
      * @return
      */
-    long connectTimeout() default 15;
+    long connectTimeout() default 8;
 
     /**
-     * 是否启用重试
+     * 请求过程超时 秒
      *
      * @return
      */
-    Retry retry() default @Retry;
+    long callTimeout() default 8;
 
     /**
      * 配置SSL

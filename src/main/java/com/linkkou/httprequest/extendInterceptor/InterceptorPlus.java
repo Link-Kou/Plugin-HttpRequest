@@ -17,8 +17,8 @@ public abstract class InterceptorPlus implements Interceptor {
     /**
      * 执行
      *
-     * @param methodcall
-     * @return
+     * @param methodcall 调用方法
+     * @return InterceptorPlus
      */
     public InterceptorPlus setMethod(Method methodcall) {
         this.methodcall = methodcall;

@@ -27,4 +27,9 @@ public class HttpBaseUrlImpl implements HttpBaseUrl {
         return HttpProperties.getCtxProp(v);
     }
 
+    public static String geUrl(String value) {
+        String v = p.matcher(value).replaceAll("");
+        return HttpProperties.getCtxProp(v);
+    }
+
 }

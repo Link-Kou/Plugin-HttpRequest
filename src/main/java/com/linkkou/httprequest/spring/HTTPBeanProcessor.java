@@ -27,7 +27,6 @@ import java.util.Set;
  * @version 1.0
  * @data 2017-04-23 12:14
  */
-/*@Configuration*/
 public class HTTPBeanProcessor extends PropertyPlaceholderConfigurer implements BeanDefinitionRegistryPostProcessor {
 
 

@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<trees properties="" code="" codeval="" msg="">
-    <model path="/src/main/java/com/linkkou/httprequest" title="基础" msg="">
-        <tree path="/extendAnnotations" title="配置-xy" tooltip="<b>Code:7*****</b>">
-            <tree path="/annotation" title="注解管理" tooltip="<b>Code:1**8*</b>"/>
-            <tree path="/beetl" title="模板生成" tooltip="<b>Code:1**8*</b>"/>
+<trees>
+    <model path="/src/main/java" title="xxx">
+        <tree path="/com/linkkou/httprequest" title="http请求">
+            <tree path="/extendAnnotations" title="扩展注解"/>
+            <tree path="/extendInterceptor" title="扩展Okhttp拦截器"/>
+            <tree path="/extendPlugin" title="扩展插件"/>
+            <tree path="/file" title="文件处理相关"/>
+            <tree path="/log" title="日志相关"/>
+            <tree path="/processor" title="动态代码生成"/>
+            <tree path="/retrofitesfactory" title="retrofites工厂"/>
+            <tree path="/serialization" title="返回序列化"/>
+            <tree path="/spring" title="Spring依赖"/>
+            <tree path="/ssl" title="ssl相关"/>
         </tree>
     </model>
 </trees>

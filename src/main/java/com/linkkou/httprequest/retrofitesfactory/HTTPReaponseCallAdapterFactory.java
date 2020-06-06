@@ -1,6 +1,7 @@
 package com.linkkou.httprequest.retrofitesfactory;
 
 
+import com.linkkou.httprequest.extendAnnotations.Retry;
 import retrofit2.Call;
 import retrofit2.CallAdapter;
 import retrofit2.Response;
@@ -12,6 +13,7 @@ import com.linkkou.httprequest.extendPlugin.HttpConversion;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.net.SocketTimeoutException;
 import java.util.List;
@@ -41,7 +43,7 @@ public class HTTPReaponseCallAdapterFactory extends CallAdapter.Factory {
      *
      * @param httpConversion
      */
-    public HTTPReaponseCallAdapterFactory(List<HttpConversion>  httpConversion, Type type) {
+    public HTTPReaponseCallAdapterFactory(List<HttpConversion> httpConversion, Type type) {
         this.httpConversion = httpConversion;
         this.type = type;
     }
@@ -52,9 +54,78 @@ public class HTTPReaponseCallAdapterFactory extends CallAdapter.Factory {
      * @param httpConversion
      * @return
      */
-    public static CallAdapter.Factory create(List<HttpConversion>  httpConversion, Type type) {
+    public static CallAdapter.Factory create(List<HttpConversion> httpConversion, Type type) {
         return new HTTPReaponseCallAdapterFactory(httpConversion, type);
     }
+
+    /**
+     * 获取到重试注解
+     *
+     * @param annotations
+     * @return
+     */
+    private Retry Retry(Annotation[] annotations) {
+        for (int i = 0; i < annotations.length; i++) {
+            final Annotation annotation = annotations[i];
+            if (annotation.annotationType() == Retry.class) {
+                final Retry retry = (Retry) annotation;
+                return retry;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 执行
+     *
+     * @param httpRF
+     * @param clone
+     * @param retry
+     * @param max
+     * @return
+     */
+    private HTTPReaponseModel Execute(HTTPReaponseModel httpRF, Call<byte[]> clone, Retry retry, int max) {
+        int retryNumber = retry == null ? 0 : retry.retryNumber();
+        if (max <= retryNumber) {
+            try {
+                //@Streaming 场景在同步情况无效,同步返回,Body流是完整的,
+                //超大文件会阻塞,直到完成
+                Response<byte[]> PR = clone.clone().execute();
+                httpRF.setError(HTTPError.OK)
+                        .setSuccessful(PR.isSuccessful())
+                        .setBody(PR.body())
+                        .setHeaders(PR.headers())
+                        .setResponse(PR.raw())
+                        .setConversion(httpConversion, PR, type);
+            } catch (SocketTimeoutException e) {
+                e.printStackTrace();
+                httpRF.setError(HTTPError.SocketTimeout);
+                if (retry != null && retry.retryType().SocketTimeout()) {
+                    return Execute(httpRF, clone, retry, max + 1);
+                }
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+                httpRF.setError(HTTPError.Runtime);
+                if (retry != null && retry.retryType().RunTime()) {
+                    return Execute(httpRF, clone, retry, max + 1);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                httpRF.setError(HTTPError.IOException);
+                if (retry != null && retry.retryType().CallTime()) {
+                    return Execute(httpRF, clone, retry, max + 1);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                httpRF.setError(HTTPError.OtherException);
+                if (retry != null && retry.retryType().Unknown()) {
+                    return Execute(httpRF, clone, retry, max + 1);
+                }
+            }
+        }
+        return httpRF;
+    }
+
 
     /**
      * 获取到返回对象
@@ -79,39 +150,14 @@ public class HTTPReaponseCallAdapterFactory extends CallAdapter.Factory {
 
                 @Override
                 public Object adapt(Call<byte[]> call) {
+                    final Call<byte[]> clone = call.clone();
                     HTTPReaponseModel httpRF = new HTTPReaponseModel();
-                    try {
-                        Response<byte[]> PR = call.execute();
-                        httpRF.setError(HTTPError.OK)
-                                .setSuccessful(PR.isSuccessful())
-                                .setBody(PR.body())
-                                .setHeaders(PR.headers())
-                                .setResponse(PR.raw())
-                                .setConversion(httpConversion, PR, type);
-                    } catch (SocketTimeoutException e) {
-                        e.printStackTrace();
-                        return httpRF.setError(HTTPError.SocketTimeout);
-                    } catch (RuntimeException e) {
-                        e.printStackTrace();
-                        return httpRF.setError(HTTPError.Runtime);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return httpRF.setError(HTTPError.IOException);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        return httpRF.setError(HTTPError.OtherException);
-                    }
-                    return httpRF;
+                    final Retry retry = Retry(annotations);
+                    return Execute(httpRF, clone, retry, 0);
                 }
             };
         }
-        try {
-            throw new IllegalAccessException("返回结果非HTTPResponse异常");
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            return null;
-        }
+        return null;
     }
 
 }

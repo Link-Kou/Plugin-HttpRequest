@@ -42,20 +42,23 @@ public interface HttpConversion {
     void bodyWriter(Writer writer, Object value, Type adapter);
 
     /**
-     * 对注解@body 对String进行默认转换
+     * 对String类型进行默认转换
+     *
      * @param writer
      * @param value
      * @param adapter
+     * @return true 非String类型 false是String类型已经转换
      */
-    default void bodyWriterString(Writer writer, Object value, Type adapter) throws IOException {
+    default Boolean bodyWriterString(Writer writer, Object value, Type adapter) throws IOException {
         if (adapter instanceof Class) {
-            if (((Class) adapter).getName().equals("java.lang.String")) {
+            if ("java.lang.String".equals(((Class) adapter).getName())) {
                 for (char c : String.valueOf(value).toCharArray()) {
                     writer.append(c);
                 }
                 writer.close();
-                return;
             }
+            return false;
         }
+        return true;
     }
 }

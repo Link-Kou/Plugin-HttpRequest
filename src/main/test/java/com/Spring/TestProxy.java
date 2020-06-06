@@ -4,8 +4,11 @@ import com.Spring.api.*;
 import com.linkkou.httprequest.HTTPResponse;
 import com.linkkou.httprequest.file.FileProgressRequestBody;
 import com.linkkou.httprequest.file.MultipartFlieBuild;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -13,10 +16,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author lk
@@ -32,6 +42,9 @@ public class TestProxy {
 
     @Autowired
     private ApiAmap amap;
+
+    @Autowired
+    private ApiTestBaiDu baiDu;
 
     @Autowired
     private ApiMsgPushServer msgPushServer;
@@ -64,6 +77,70 @@ public class TestProxy {
         if (weather.isSuccessful()) {
             logger.debug(String.format(" weather --> %s", weather.getBodyString()));
         }
+    }
+
+    /**
+     * 百度
+     * Get请求示列
+     * 请求传递  Url
+     * 请求传参  ?key=%s&....
+     */
+    @Test
+    public void GetBaidu() {
+        /**
+         * 请求
+         */
+        final HTTPResponse<String> weather = baiDu.baidu("7bb4c8a8ff0745c44f3bf0a5b35b389b");
+        if (weather.isSuccessful()) {
+            logger.debug(String.format(" weather --> %s", weather.getBodyString()));
+        }
+    }
+
+    /**
+     * 原生版本 - 高德地图-天气接口
+     * Get请求示列
+     * 请求传递  Url
+     * 请求传参  ?key=%s&....
+     */
+    @Test
+    public void GetPrimaryWeather() throws IOException {
+        /**
+         * 请求
+         */
+        final Call<ResponseBody> responseBodyCall = amap.weatherPrimary("7bb4c8a8ff0745c44f3bf0a5b35b389b", "110000", null, null);
+        final Response<ResponseBody> execute = responseBodyCall.execute();
+        if (execute.isSuccessful()) {
+            final ResponseBody body = execute.body();
+            String returnbody = new String(body.bytes(), "utf-8");
+        }
+    }
+
+    /**
+     * RX版本 - 高德地图-天气接口
+     * Get请求示列
+     * 请求传递  Url
+     * 请求传参  ?key=%s&....
+     */
+    @Test
+    public void GetRXPrimaryWeather() throws IOException, InterruptedException {
+        long startTime = System.currentTimeMillis();
+        /**
+         * 请求
+         */
+        final Observable<ResponseBody> stringObservable = amap.ObWeather("7bb4c8a8ff0745c44f3bf0a5b35b389b", "110000", null, null);
+        stringObservable.subscribeOn(Schedulers.io()).subscribe(x -> {
+            Thread.sleep(3000);
+            System.out.println("->>>>>" + x.string());
+        }, x -> {
+
+        });
+        long endTime = System.currentTimeMillis();
+        System.out.println("当前程序耗时：" + (endTime - startTime) + "ms");
+        new CountDownLatch(1).await(3, TimeUnit.MINUTES);
+        /*if (execute.isSuccessful()) {
+            final ResponseBody body = execute.body();
+            String returnbody = new String(body.bytes(), "utf-8");
+        }*/
     }
 
     /**
@@ -166,9 +243,57 @@ public class TestProxy {
         /**
          * 同步阻塞，服务端目前无场景需要实现下载功能
          */
-        final HTTPResponse<ReqOutUser> reqOutUserHTTPResponse = downloadFile.downloadFile("http://pic1.nipic.com/2008-08-14/2008814183939909_2.jpg");
-
+        final HTTPResponse<ReqOutUser> reqOutUserHTTPResponse = downloadFile.downloadFile("100MB-atlanta.bin");
         reqOutUserHTTPResponse.getBodyBytes();
+    }
+
+
+    /**
+     * 文件下载图片
+     */
+    @Test
+    public void GetObDownloadFile() throws InterruptedException {
+        /**
+         * 同步阻塞，服务端目前无场景需要实现下载功能
+         */
+        final Observable<ResponseBody> responseBodyObservable = downloadFile.ObdownloadFile("100MB-atlanta.bin");
+        responseBodyObservable.subscribeOn(Schedulers.io())
+                .flatMap(x -> {
+                    Disk.writeResponseBodyToDisk(x);
+                    return Observable.just(true);
+                })
+                .subscribe(x -> {
+                    System.out.println("asdasd");
+                });
+        new CountDownLatch(1).await(3, TimeUnit.MINUTES);
+    }
+
+    /**
+     * 文件下载图片
+     */
+    @Test
+    public void GetCallDownloadFile() throws InterruptedException {
+        /**
+         * 同步阻塞，服务端目前无场景需要实现下载功能
+         */
+        final Call<ResponseBody> responseBodyCall = downloadFile.CalldownloadFile("100MB-atlanta.bin");
+        responseBodyCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, final Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    logger.info("server contacted and has file");
+                    Disk.writeResponseBodyToDisk(response.body());
+                } else {
+                    logger.info("server contacted and has file");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                logger.info("Error");
+            }
+        });
+        new CountDownLatch(1).await(3, TimeUnit.MINUTES);
     }
 
 

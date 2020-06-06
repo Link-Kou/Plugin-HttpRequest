@@ -19,7 +19,7 @@ import java.lang.reflect.Method;
  */
 public class InterceptorCookie implements Interceptor {
 
-    private String CookieVal;
+    private String cookieVal;
 
     private Boolean isCookie = false;
 
@@ -53,9 +53,10 @@ public class InterceptorCookie implements Interceptor {
                 stringBuilder.append(";");
             }
             String d = stringBuilder.toString();
-            CookieVal = d.substring(0, d.length() - 1);
+            cookieVal = d.substring(0, d.length() - 1);
         }
     }
+
 
     @Override
     public Response intercept(Chain chain) throws IOException {
@@ -67,8 +68,8 @@ public class InterceptorCookie implements Interceptor {
             Request.Builder Builder = chain.request()
                     .newBuilder();
             Builder.removeHeader("Cookie");
-            if (CookieVal != null && CookieVal.length() > 0) {
-                Builder.addHeader("Cookie", cookie == null ? CookieVal : cookie + CookieVal);
+            if (cookieVal != null && cookieVal.length() > 0) {
+                Builder.addHeader("Cookie", cookie == null ? cookieVal : cookie + cookieVal);
             }
             return chain.proceed(Builder.build());
         }

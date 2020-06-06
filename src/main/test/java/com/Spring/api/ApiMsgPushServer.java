@@ -1,7 +1,6 @@
 package com.Spring.api;
 
 import com.linkkou.httprequest.HTTPRequest;
-import com.linkkou.httprequest.HTTPRequest.Retry;
 import com.linkkou.httprequest.HTTPResponse;
 import org.springframework.beans.factory.annotation.Value;
 import retrofit2.http.Field;
@@ -16,9 +15,7 @@ import retrofit2.http.POST;
  * @date 2017-12-22 21:11
  */
 @HTTPRequest(
-        value = @Value("${message.url}"),
-        retry = @Retry(retryFailure = true, retryNumber = 1, retryUrl = @Value("${message.url}")),
-        connectTimeout = 5
+        value = @Value("${message.url}")
 )
 public interface ApiMsgPushServer {
 

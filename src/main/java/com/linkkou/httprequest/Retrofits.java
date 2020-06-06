@@ -1,21 +1,24 @@
 package com.linkkou.httprequest;
 
 import com.linkkou.httprequest.extendInterceptor.*;
+import com.linkkou.httprequest.extendPlugin.HttpConversion;
+import com.linkkou.httprequest.extendPlugin.impl.HttpBaseUrlImpl;
+import com.linkkou.httprequest.log.HttpLogger;
 import com.linkkou.httprequest.retrofitesfactory.HTTPReaponseCallAdapterFactory;
 import com.linkkou.httprequest.retrofitesfactory.HTTPResponseConverterFactory;
-import com.plugin.httprequest.extendInterceptor.*;
 import com.linkkou.httprequest.ssl.NotSSL;
 import com.linkkou.httprequest.ssl.UserSSL;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Retrofit;
-import com.linkkou.httprequest.extendPlugin.HttpConversion;
-import com.linkkou.httprequest.extendPlugin.impl.HttpBaseUrlImpl;
-import com.linkkou.httprequest.log.HttpLogger;
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
-import java.lang.reflect.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -63,7 +66,7 @@ public class Retrofits {
      * @param args           参数值
      * @return
      */
-    public HTTPReaponseModel getRetrofit(List<HttpConversion>  httpConversion, List<InterceptorPlus> okhttpInterceptor, Class classs, Method methodcall, Object... args) {
+    public Object getRetrofit(List<HttpConversion> httpConversion, List<InterceptorPlus> okhttpInterceptor, Class classs, Method methodcall, Object... args) throws InvocationTargetException, IllegalAccessException {
         HTTPRequest HTTPRequest = (com.linkkou.httprequest.HTTPRequest) classs.getAnnotation(HTTPRequest.class);
         OkHttpClient.Builder httpBuilder = new OkHttpClient.Builder();
         /**
@@ -72,12 +75,12 @@ public class Retrofits {
          */
         final OkHttpClient.Builder builder = httpBuilder
                 //允许失败重试
-                .retryOnConnectionFailure(HTTPRequest.retry().retryFailure())
+                .retryOnConnectionFailure(true)
                 .writeTimeout(HTTPRequest.writeTimeout(), TimeUnit.SECONDS)
                 .readTimeout(HTTPRequest.readTimeout(), TimeUnit.SECONDS)
                 .connectTimeout(HTTPRequest.connectTimeout(), TimeUnit.SECONDS)
+                .callTimeout(HTTPRequest.callTimeout(), TimeUnit.SECONDS)
                 .addInterceptor(new InterceptorCookie(methodcall))
-                .addInterceptor(new InterceptorGetBody(methodcall))
                 .addInterceptor(new InterceptorConnection());
         //添加自定义拦截器
         if (okhttpInterceptor != null) {
@@ -85,8 +88,9 @@ public class Retrofits {
         }
         //添加日志与重试连接器
         //OKHttp在执行调用拦截器以List有序调用，在拦截器执行请求后续再执行请求会发送多次请求
-        builder.addInterceptor(new InterceptorRetryDirectional(HTTPRequest.retry()))
-                .addInterceptor(new InterceptorHttpLogging());
+        builder.addInterceptor(new InterceptorHttpLogging(methodcall))
+        ;
+
 
         OkHttpClient okHttpClient = builder.build();
         /**
@@ -104,12 +108,13 @@ public class Retrofits {
                  * 请求结果转换的自定义返回参数
                  */
                 .addCallAdapterFactory(HTTPReaponseCallAdapterFactory.create(httpConversion, type))
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.createSynchronous())
                 //主机地址
                 .baseUrl(new HttpBaseUrlImpl(HTTPRequest).geUrl())
                 .build();
-        try {
-            Object Ob = retrofit.create(classs);
-            Method[] methods = Ob.getClass().getMethods();
+
+        Object Ob = retrofit.create(classs);
+        Method[] methods = Ob.getClass().getMethods();
 			/*代码予以保留！作为参考依据
 			for (Method m : methods) {
 				//对象必须要相同
@@ -117,12 +122,8 @@ public class Retrofits {
 					method = m;
 				}
 			}*/
-            Method method = methodoverload(methods, methodcall);
-            return (HTTPReaponseModel) Objects.requireNonNull(method).invoke(Ob, args);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new HTTPReaponseModel();
+        Method method = methodoverload(methods, methodcall);
+        return Objects.requireNonNull(method).invoke(Ob, args);
     }
 
     /**

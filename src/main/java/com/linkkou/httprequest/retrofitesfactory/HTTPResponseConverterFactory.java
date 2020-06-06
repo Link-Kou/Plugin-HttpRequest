@@ -35,12 +35,13 @@ public class HTTPResponseConverterFactory extends Factory {
     }
 
     /**
-     * @param type
-     * @param parameterAnnotations
-     * @param methodAnnotations
-     * @param retrofit
-     * @return
-     * @body需要解析
+     * body解析
+     *
+     * @param type                 类型
+     * @param parameterAnnotations 参数注解
+     * @param methodAnnotations    方法
+     * @param retrofit             对象
+     * @return Converter
      */
     @Override
     public Converter<?, RequestBody> requestBodyConverter(Type type, Annotation[] parameterAnnotations, Annotation[] methodAnnotations, Retrofit retrofit) {
@@ -94,14 +95,12 @@ public class HTTPResponseConverterFactory extends Factory {
         if (((ParameterizedTypeImpl) type).getRawType() == HTTPResponse.class) {
             return HTTPResponseConverter.INSTANCE;
         }
-        //其它类型我们不处理，继续错误输出
-        try {
+        //其它类型我们不处理,返回NUll即可
+        /*try {
             throw new IllegalAccessException("返回结果非HTTPResponse异常");
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            return null;
-        }
-
+        }*/
+        return null;
     }
 }

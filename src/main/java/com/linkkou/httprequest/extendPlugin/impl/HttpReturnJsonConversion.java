@@ -55,21 +55,21 @@ public class HttpReturnJsonConversion implements HttpConversion {
     }
 
     /**
+     * body 注解输入对象进行转换
+     *
      * @param writer byte输出流
      * @param o      对象
      * @param type   对象类型
-     * @body注解输入对象进行转换
      */
     @Override
     public void bodyWriter(Writer writer, Object o, Type type) {
         try {
-            if (type instanceof ParameterizedTypeImpl) {
+            if (this.bodyWriterString(writer, o, type)) {
+                TypeAdapter adapter = Json.gson.getAdapter(TypeToken.get(type));
+                JsonWriter jsonWriter = Json.gson.newJsonWriter(writer);
+                adapter.write(jsonWriter, o);
+                jsonWriter.close();
             }
-            this.bodyWriterString(writer,o,type);
-            TypeAdapter adapter = Json.gson.getAdapter(TypeToken.get(type));
-            JsonWriter jsonWriter = Json.gson.newJsonWriter(writer);
-            adapter.write(jsonWriter, o);
-            jsonWriter.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

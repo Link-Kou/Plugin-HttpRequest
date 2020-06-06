@@ -1,5 +1,6 @@
 package com.linkkou.httprequest;
 
+import com.linkkou.httprequest.extendPlugin.HttpConversion;
 import com.linkkou.httprequest.extendPlugin.impl.HttpReturnJsonConversion;
 
 /**
@@ -54,7 +55,7 @@ public interface HTTPResponse<T> {
     boolean isSuccessful();
 
     /**
-     * 转换结果 {@link HttpReturnJsonConversion}
+     * 转换结果 {@link HttpConversion}
      * 在一定的情况下，model转换失败会返回null
      *
      * @return T 转换成功返回对象 转换失败返回 null
@@ -62,7 +63,7 @@ public interface HTTPResponse<T> {
     T getModel();
 
     /**
-     * 转换结果 {@link HttpReturnJsonConversion}
+     * 转换结果 {@link HttpConversion}
      * 在一定的情况下，model转换失败会返回null
      *
      * @return T 转换成功返回对象 转换失败返回 null
