@@ -68,6 +68,7 @@
 ```
 
 `基本使用方式`
+---
 支持retrofit2所有使用方式。你会retrofit2就可以极低成本的在Spring环境中使用retrofit2。于此同时。借助retrofit2的齐全文档。有效解决学习成本问题
 ```java
 /**
