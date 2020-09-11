@@ -9,20 +9,23 @@ import org.w3c.dom.NodeList;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author lk
+ */
 public class SpaceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
+    @Override
     protected Class getBeanClass(Element element) {
         return HTTPBeanProcessor.class;
     }
 
+    @Override
     protected void doParse(Element element, BeanDefinitionBuilder bean) {
-//        String name = element.getAttribute("name");
         NodeList nodeList = element.getChildNodes();
         List<String> list = new ArrayList<>();
         for (int i = 0 ;i< nodeList.getLength();i++){
             Node node = nodeList.item(i);
             if(node.getNodeType() == 1){
-                //list.add(node.getAttributes().getNamedItem("value").getNodeValue());
                 list.add(node.getTextContent());
             }
         }

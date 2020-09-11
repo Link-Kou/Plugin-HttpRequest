@@ -6,9 +6,6 @@ import com.google.gson.stream.JsonWriter;
 import com.linkkou.httprequest.extendPlugin.HttpConversion;
 import com.linkkou.httprequest.serialization.Json;
 import retrofit2.Response;
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
-
-import javax.persistence.EntityNotFoundException;
 import java.io.Writer;
 import java.lang.reflect.Type;
 import java.util.Optional;
@@ -50,8 +47,7 @@ public class HttpReturnJsonConversion implements HttpConversion {
                 e.printStackTrace();
             }
         }
-        return Optional.ofNullable(type)
-                .orElseThrow(() -> new EntityNotFoundException("HTTP HttpReturnJsonConversion Data The Unknown"));
+        return Optional.of(type);
     }
 
     /**

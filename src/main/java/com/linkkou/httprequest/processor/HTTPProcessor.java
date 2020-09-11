@@ -27,7 +27,7 @@ import java.util.*;
  * @author LK
  * @date 2018-05-31 10:46
  */
-@SupportedAnnotationTypes({"com.plugin.httprequest.processor.HTTPRequestTest"})
+@SupportedAnnotationTypes({"com.linkkou.httprequest.processor.HTTPRequestTest"})
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class HTTPProcessor extends AbstractProcessor {
 
