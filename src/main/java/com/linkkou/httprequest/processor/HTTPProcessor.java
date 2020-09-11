@@ -135,7 +135,7 @@ public class HTTPProcessor extends AbstractProcessor {
             }
             String HTTPRequestTestVaule = "";
             for (JCTree.JCAnnotation jcAnnotation : var1.mods.getAnnotations()) {
-                if (!jcAnnotation.getAnnotationType().type.toString().equals("com.plugin.httprequest.processor.HTTPRequestTest")) {
+                if (!jcAnnotation.getAnnotationType().type.toString().equals(HTTPRequestTest.class.getName())) {
                     return;
                 } else {
                     for (Pair<Symbol.MethodSymbol, Attribute> pair : jcAnnotation.attribute.values) {
@@ -149,7 +149,7 @@ public class HTTPProcessor extends AbstractProcessor {
                     //类名称 会自己导入包
                     make.Select(
                             make.Select(
-                                    make.Select(make.Select(make.Ident(names.fromString("com")), names.fromString("plugin"))
+                                    make.Select(make.Select(make.Ident(names.fromString("com")), names.fromString("linkkou"))
                                             , names.fromString("httprequest")
                                     )
                                     , names.fromString("processor")
