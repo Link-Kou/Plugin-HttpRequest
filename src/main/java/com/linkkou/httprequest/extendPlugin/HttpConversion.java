@@ -56,8 +56,8 @@ public interface HttpConversion {
                     writer.append(c);
                 }
                 writer.close();
+                return false;
             }
-            return false;
         }
         return true;
     }
