@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-public class HTTPProxyInstanceTest {
+public class HTTPProxyInstance {
 
     /**
      * Okhttp自定义拦截器
@@ -31,7 +31,7 @@ public class HTTPProxyInstanceTest {
     private String properties;
 
 
-    public HTTPProxyInstanceTest(Class target, String properties) {
+    public HTTPProxyInstance(Class target, String properties) {
         this.target = target;
         this.properties = properties;
     }

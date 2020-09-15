@@ -154,7 +154,7 @@ public class HTTPProcessor extends AbstractProcessor {
                                     )
                                     , names.fromString("processor")
                             )
-                            , names.fromString("HTTPProxyInstanceTest")
+                            , names.fromString("HTTPProxyInstance")
                     ),
                     //参数
                     com.sun.tools.javac.util.List.of(
