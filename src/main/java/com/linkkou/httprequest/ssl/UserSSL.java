@@ -6,6 +6,7 @@ import javax.net.ssl.*;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -81,13 +82,13 @@ public class UserSSL {
 
     }
 
-    private static void getFile(String pathname){
+    private static void getFile(String pathname) {
         //同一个包下,还是要包名/文件名
         URL u1 = Thread.currentThread().getContextClassLoader().getResource(pathname);
         try {
             if (u1 != null) {
-                InputStream in = new BufferedInputStream(new FileInputStream(u1.getPath()));
-
+                final String decode = URLDecoder.decode(u1.getPath(), "UTF-8");
+                InputStream in = new BufferedInputStream(new FileInputStream(decode));
             } else {
                 throw new IOException("Properties Is Null");
             }

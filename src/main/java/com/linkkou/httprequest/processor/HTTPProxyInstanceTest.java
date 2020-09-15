@@ -11,6 +11,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -74,7 +75,8 @@ public class HTTPProxyInstanceTest {
         URL u1 = Thread.currentThread().getContextClassLoader().getResource(properties);
         try {
             if (u1 != null) {
-                InputStream in = new BufferedInputStream(new FileInputStream(u1.getPath()));
+                final String decode = URLDecoder.decode(u1.getPath(), "UTF-8");
+                InputStream in = new BufferedInputStream(new FileInputStream(decode));
                 Properties props = new Properties();
                 props.load(in);
                 new HttpProperties(props);
