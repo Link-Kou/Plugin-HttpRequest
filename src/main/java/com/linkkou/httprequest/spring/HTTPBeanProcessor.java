@@ -7,10 +7,10 @@ import com.linkkou.httprequest.extendPlugin.HttpConversion;
 import org.reflections.Reflections;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
@@ -27,7 +27,7 @@ import java.util.Set;
  * @version 1.0
  * @data 2017-04-23 12:14
  */
-public class HTTPBeanProcessor extends PropertyPlaceholderConfigurer implements BeanDefinitionRegistryPostProcessor {
+public class HTTPBeanProcessor extends PropertySourcesPlaceholderConfigurer implements BeanDefinitionRegistryPostProcessor {
 
 
     private String[] prefix;

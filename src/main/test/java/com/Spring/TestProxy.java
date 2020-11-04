@@ -61,6 +61,22 @@ public class TestProxy {
     @Autowired
     private ApiBody apiBody;
 
+    @Autowired
+    private ApiBaseAuth apiBaseAuth;
+
+    /**
+     * Base 加密
+     */
+    @Test
+    public void GetApiBaseAuth() {
+        /**
+         * 请求
+         */
+        final HTTPResponse<String> basic = apiBaseAuth.get("{\"reqJSON\":\"{\\\"item\\\":{\\\"message\\\": \\\"7788\\\"}}\"}", "Basic UElVU0VSOkluaXQxMjM0");
+        if (basic.isSuccessful()) {
+            logger.debug(String.format(" apiBaseAuth --> %s", basic.getBodyString()));
+        }
+    }
 
     /**
      * 高德地图-天气接口
