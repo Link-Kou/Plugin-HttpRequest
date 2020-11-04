@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import com.linkkou.httprequest.extendPlugin.HttpBaseUrl;
 import com.linkkou.httprequest.spring.HttpProperties;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -23,13 +24,13 @@ public class HttpBaseUrlImpl implements HttpBaseUrl {
     @Override
     public String geUrl() {
         Value value = HTTPRequest.value();
-        String v = p.matcher(value.value()).replaceAll("");
-        return HttpProperties.getCtxProp(v);
-    }
-
-    public static String geUrl(String value) {
-        String v = p.matcher(value).replaceAll("");
-        return HttpProperties.getCtxProp(v);
+        final Matcher matcher = p.matcher(value.value());
+        if (matcher.matches()) {
+            String v = p.matcher(value.value()).replaceAll("");
+            return HttpProperties.getCtxProp(v);
+        } else {
+            return value.value();
+        }
     }
 
 }
