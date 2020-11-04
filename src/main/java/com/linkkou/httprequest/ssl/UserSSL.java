@@ -19,12 +19,42 @@ import java.util.concurrent.TimeUnit;
  */
 public class UserSSL {
 
-    public static void SSL(OkHttpClient okHttpClient, String password, String pathname) {
+    public static void ownSSL(OkHttpClient okHttpClient, String password, String pathname) {
+        // 实例化密钥库 & 初始化密钥工厂
+        File file = new File(pathname);
+        InputStream certStream = null;
+        try {
+            certStream = new FileInputStream(file);
+            SSL(okHttpClient, password, certStream);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 自定义加载
+     *
+     * @param aclass
+     */
+    public static void loadSSLFile(OkHttpClient okHttpClient, Class<?> aclass) {
+        try {
+            final Object o = aclass.newInstance();
+            if (o instanceof SSLLoadFile) {
+                SSLLoadFile sslLoadFile = (SSLLoadFile) o;
+                final InputStream file = sslLoadFile.getFile();
+                final String password = sslLoadFile.getPassword();
+                SSL(okHttpClient, password, file);
+            }
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private static void SSL(OkHttpClient okHttpClient, String password, InputStream certStream) {
         // 实例化密钥库 & 初始化密钥工厂
         try {
             char[] passwordchar = password.toCharArray();
-            File file = new File(pathname);
-            InputStream certStream = new FileInputStream(file);
             KeyStore ks = KeyStore.getInstance("PKCS12");
             ks.load(certStream, passwordchar);
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
@@ -82,7 +112,7 @@ public class UserSSL {
 
     }
 
-    private static void getFile(String pathname) {
+    private static void getResourceFile(String pathname) {
         //同一个包下,还是要包名/文件名
         URL u1 = Thread.currentThread().getContextClassLoader().getResource(pathname);
         try {

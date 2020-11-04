@@ -46,7 +46,11 @@ public @interface HTTPRequest {
             /**
              * 自己定义SSL的p12文件进行请求
              */
-            OWNSSL
+            OWNSSL,
+            /**
+             * 自己定义SSL的加载路径
+             */
+            OWNClASSSSL
         }
 
         /**
@@ -57,10 +61,15 @@ public @interface HTTPRequest {
         SSLConfig SSL() default SSLConfig.DEFAULT;
 
         /**
+         * 执行相关类型,获取到文件流程
+         * @return Class
+         */
+        Class<?> SSLLoad() default String.class;
+
+        /**
          * 双向安全证书
-         * 从资源文件夹中读取
-         *
-         * @return
+         * 从执行路径中读取,路径为绝对路径
+         * @return String
          */
         String SSLfile() default "";
 

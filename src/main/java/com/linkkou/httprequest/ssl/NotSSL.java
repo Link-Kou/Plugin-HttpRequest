@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class NotSSL {
 
-    public static void SSL(OkHttpClient sClient){
+    public static void notSSL(OkHttpClient sClient){
         SSLContext sc = null;
         try {
             sc = SSLContext.getInstance("SSL");

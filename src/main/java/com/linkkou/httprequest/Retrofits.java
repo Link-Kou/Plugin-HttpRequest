@@ -134,13 +134,16 @@ public class Retrofits {
      * @param okHttpClient
      */
     private void SSL(HTTPRequest HTTPRequest, OkHttpClient.Builder builder, OkHttpClient okHttpClient) {
-        final com.linkkou.httprequest.HTTPRequest.SSL.SSLConfig ssl = HTTPRequest.ssl().SSL();
+        final HTTPRequest.SSL.SSLConfig ssl = HTTPRequest.ssl().SSL();
         switch (ssl) {
             case NOTSSL:
-                NotSSL.SSL(okHttpClient);
+                NotSSL.notSSL(okHttpClient);
                 return;
             case OWNSSL:
-                UserSSL.SSL(okHttpClient, HTTPRequest.ssl().SSLPassword(), HTTPRequest.ssl().SSLfile());
+                UserSSL.ownSSL(okHttpClient, HTTPRequest.ssl().SSLPassword(), HTTPRequest.ssl().SSLfile());
+                return;
+            case OWNClASSSSL:
+                UserSSL.loadSSLFile(okHttpClient,HTTPRequest.ssl().SSLLoad());
                 return;
             case DEFAULT:
             default:
