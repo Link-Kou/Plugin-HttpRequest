@@ -5,6 +5,12 @@
 > 基于OkHttp的retrofit2二次封装实现以下功能
 - 基于Spring实现@Autowired注入
 - 扩展输入输出解析，实现自定义拦截器
+- 支持Spring环境和非Spring环境
+
+## 同类
+
+- `feign` Http请求工具[https://github.com/OpenFeign/feign](https://github.com/OpenFeign/feign)
+
 
 场景
 ---
@@ -77,10 +83,35 @@ Maven
 </bean>
 ```
 
+```java
+/**
+ * @author lk
+ * @version 1.0
+ * @date 2020/9/11 11:29
+ */
+public class HttpRequestConfig {
+
+    @Bean
+    public HTTPBeanProcessor httpBeanProcessor() throws IOException {
+        HTTPBeanProcessor httpBeanProcessor = new HTTPBeanProcessor();
+        httpBeanProcessor.setPrefix(Arrays.asList("com").toArray(new String[0]));
+        final HttpReturnJsonConversion httpReturnJsonConversion = new HttpReturnJsonConversion();
+        httpBeanProcessor.setHttpConversion(Arrays.asList(httpReturnJsonConversion));
+        httpBeanProcessor.setLocations(
+                new PathMatchingResourcePatternResolver().getResources("classpath*:httpurl.properties")
+        );
+        return httpBeanProcessor;
+    }
+}
+
+```
+
 `基本使用方式`
 ---
 支持retrofit2所有使用方式。你会retrofit2就可以极低成本的在Spring环境中使用retrofit2。于此同时。借助retrofit2的齐全文档。有效解决学习成本问题
+
 ```java
+
 /**
  * 高德API示列
  *
@@ -105,38 +136,6 @@ public interface ApiAmap {
                                      @Query("city") String city,
                                      @Query("extensions") String extensions,
                                      @Query("output") String output);
-
-
-    /**
-     * 高德 天气查询
-     *
-     * @param key        用户在高德地图官网申请web服务API类型KEY
-     * @param city       输入城市的adcode，adcode信息可参考城市编码表
-     * @param extensions 可选值：base/all base:返回实况天气 all:返回预报天气 可选性输入null
-     * @param output     可选值：JSON,XML 可选性输入null
-     * @return 天气对象
-     */
-    @GET("weather/weatherInfo")
-    Observable<ResponseBody> ObWeather(@Query("key") String key,
-                               @Query("city") String city,
-                               @Query("extensions") String extensions,
-                               @Query("output") String output);
-
-
-    /**
-     * 高德 天气查询
-     *
-     * @param key        用户在高德地图官网申请web服务API类型KEY
-     * @param city       输入城市的adcode，adcode信息可参考城市编码表
-     * @param extensions 可选值：base/all base:返回实况天气 all:返回预报天气 可选性输入null
-     * @param output     可选值：JSON,XML 可选性输入null
-     * @return 天气对象
-     */
-    @GET("weather/weatherInfo")
-    Call<ResponseBody> weatherPrimary(@Query("key") String key,
-                                      @Query("city") String city,
-                                      @Query("extensions") String extensions,
-                                      @Query("output") String output);
 
 }
 
