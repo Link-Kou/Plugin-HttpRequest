@@ -24,13 +24,8 @@ public class HttpBaseUrlImpl implements HttpBaseUrl {
     @Override
     public String geUrl() {
         Value value = HTTPRequest.value();
-        final Matcher matcher = p.matcher(value.value());
-        if (matcher.matches()) {
-            String v = p.matcher(value.value()).replaceAll("");
-            return HttpProperties.getCtxProp(v);
-        } else {
-            return value.value();
-        }
+        String v = p.matcher(value.value()).replaceAll("");
+        return HttpProperties.getCtxProp(v);
     }
 
 }

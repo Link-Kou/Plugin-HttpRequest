@@ -26,7 +26,7 @@ Maven
 <dependency>
     <groupId>com.github.link-kou</groupId>
     <artifactId>http-request</artifactId>
-    <version>1.0.7</version>
+    <version>1.0.7.1</version>
 </dependency>
 ```
 
@@ -46,7 +46,6 @@ Maven
 - `规定时间内请求缓存数据` 支持在一定的时间内请求同一个接口并且请求数据一致情况下缓存数据。 `不支持`
 - `文件下载` 支持文件异步下载。 `支持`
 - `文件断点下载` 支持文件异步断点下载。 `不支持`
-- `OAuth` 多个接口请求之前需要携带特点的参数值。 `支持,未添加示列`
 
 代码案例
 ---
@@ -138,6 +137,17 @@ public interface ApiAmap {
                                      @Query("output") String output);
 
 }
+
+```
+
+代码案例
+---
+`非Spring配置`
+
+```java
+
+@HTTPRequestTest("httpurl.properties")
+private ApiAmap apiAmap;
 
 ```
 
