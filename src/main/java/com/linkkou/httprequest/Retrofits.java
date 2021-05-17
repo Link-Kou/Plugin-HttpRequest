@@ -21,6 +21,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -38,6 +39,11 @@ public class Retrofits {
     private String baseUrl = "";
 
     private Type type;
+
+    /**
+     * 缓存每一个线程中的OkHttpClient
+     */
+    public static final ConcurrentHashMap<Long, OkHttpClient> NON_BLOCKING_HASHMAP = new ConcurrentHashMap<>();
 
     /**
      * 获取对象返回值
@@ -68,35 +74,38 @@ public class Retrofits {
      */
     public Object getRetrofit(List<HttpConversion> httpConversion, List<InterceptorPlus> okhttpInterceptor, Class classs, Method methodcall, Object... args) throws InvocationTargetException, IllegalAccessException {
         HTTPRequest HTTPRequest = (com.linkkou.httprequest.HTTPRequest) classs.getAnnotation(HTTPRequest.class);
-        OkHttpClient.Builder httpBuilder = new OkHttpClient.Builder();
-        /**
-         * HTTP请求
-         * SECONDS:秒
-         */
-        final OkHttpClient.Builder builder = httpBuilder
-                //允许失败重试
-                .retryOnConnectionFailure(true)
-                .writeTimeout(HTTPRequest.writeTimeout(), TimeUnit.SECONDS)
-                .readTimeout(HTTPRequest.readTimeout(), TimeUnit.SECONDS)
-                .connectTimeout(HTTPRequest.connectTimeout(), TimeUnit.SECONDS)
-                .callTimeout(HTTPRequest.callTimeout(), TimeUnit.SECONDS)
-                .addInterceptor(new InterceptorCookie(methodcall))
-                .addInterceptor(new InterceptorConnection());
-        //添加自定义拦截器
-        if (okhttpInterceptor != null) {
-            okhttpInterceptor.stream().filter(Objects::nonNull).forEach(x -> builder.addInterceptor(x.setMethod(methodcall)));
+        //TODO 简单复用OkHttpClient,后续在优化
+        long l = HTTPRequest.writeTimeout() + HTTPRequest.readTimeout() + HTTPRequest.connectTimeout();
+        OkHttpClient okHttpClient = NON_BLOCKING_HASHMAP.get(l);
+        if (null == okHttpClient) {
+            OkHttpClient.Builder httpBuilder = new OkHttpClient.Builder();
+            /**
+             * HTTP请求
+             * SECONDS:秒
+             */
+            final OkHttpClient.Builder builder = httpBuilder
+                    //允许失败重试
+                    .retryOnConnectionFailure(true)
+                    .writeTimeout(HTTPRequest.writeTimeout(), TimeUnit.SECONDS)
+                    .readTimeout(HTTPRequest.readTimeout(), TimeUnit.SECONDS)
+                    .connectTimeout(HTTPRequest.connectTimeout(), TimeUnit.SECONDS)
+                    .callTimeout(HTTPRequest.callTimeout(), TimeUnit.SECONDS)
+                    .addInterceptor(new InterceptorCookie(methodcall))
+                    .addInterceptor(new InterceptorConnection());
+            //添加自定义拦截器
+            if (okhttpInterceptor != null) {
+                okhttpInterceptor.stream().filter(Objects::nonNull).forEach(x -> builder.addInterceptor(x.setMethod(methodcall)));
+            }
+            //添加日志与重试连接器
+            //OKHttp在执行调用拦截器以List有序调用，在拦截器执行请求后续再执行请求会发送多次请求
+            builder.addInterceptor(new InterceptorHttpLogging(methodcall));
+            okHttpClient = builder.build();
+            /**
+             * SSL安全连接
+             */
+            SSL(HTTPRequest, builder, okHttpClient);
+            NON_BLOCKING_HASHMAP.put(l, okHttpClient);
         }
-        //添加日志与重试连接器
-        //OKHttp在执行调用拦截器以List有序调用，在拦截器执行请求后续再执行请求会发送多次请求
-        builder.addInterceptor(new InterceptorHttpLogging(methodcall))
-        ;
-
-
-        OkHttpClient okHttpClient = builder.build();
-        /**
-         * SSL安全连接
-         */
-        SSL(HTTPRequest, builder, okHttpClient);
         //1.创建Retrofit对象
         Retrofit retrofit = new Retrofit.Builder()
                 .client(okHttpClient)
@@ -115,13 +124,6 @@ public class Retrofits {
 
         Object Ob = retrofit.create(classs);
         Method[] methods = Ob.getClass().getMethods();
-			/*代码予以保留！作为参考依据
-			for (Method m : methods) {
-				//对象必须要相同
-				if(m.getName() == methodcall.getName()){
-					method = m;
-				}
-			}*/
         Method method = methodoverload(methods, methodcall);
         return Objects.requireNonNull(method).invoke(Ob, args);
     }
@@ -143,7 +145,7 @@ public class Retrofits {
                 UserSSL.ownSSL(okHttpClient, HTTPRequest.ssl().SSLPassword(), HTTPRequest.ssl().SSLfile());
                 return;
             case OWNClASSSSL:
-                UserSSL.loadSSLFile(okHttpClient,HTTPRequest.ssl().SSLLoad());
+                UserSSL.loadSSLFile(okHttpClient, HTTPRequest.ssl().SSLLoad());
                 return;
             case DEFAULT:
             default:

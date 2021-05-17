@@ -114,7 +114,7 @@ public @interface HTTPRequest {
      *
      * @return
      */
-    long callTimeout() default 8;
+    long callTimeout() default 24;
 
     /**
      * 配置SSL

@@ -60,6 +60,9 @@ public class ProxyObjects implements FactoryBean, InitializingBean, DisposableBe
      */
     private Object proxyObj;
 
+    private final Retrofits retrofits = new Retrofits();
+
+
     @Override
     public void afterPropertiesSet() throws Exception {
         //返回代理实现
@@ -70,7 +73,6 @@ public class ProxyObjects implements FactoryBean, InitializingBean, DisposableBe
                 if (method.getDeclaringClass() == Object.class) {
                     return method.invoke(this, args);
                 } else {
-                    Retrofits retrofits = new Retrofits();
                     retrofits.getActualTypeArguments(method);
                     return retrofits.getRetrofit(httpConversion, okhttpInterceptor, serviceClass, method, args);
                 }
