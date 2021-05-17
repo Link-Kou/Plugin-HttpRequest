@@ -26,7 +26,7 @@ Maven
 <dependency>
     <groupId>com.github.link-kou</groupId>
     <artifactId>http-request</artifactId>
-    <version>1.0.7.1</version>
+    <version>1.0.7.2</version>
 </dependency>
 ```
 
